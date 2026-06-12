@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
@@ -11,9 +11,19 @@ import {
 } from "@/components/ui/accordion";
 import {
   MapPin, Phone, Mail, Send, Egg, Drumstick, Leaf, Heart,
-  ShieldCheck, Sparkles, Truck, GraduationCap,
+  ShieldCheck, Sparkles, Truck, GraduationCap, Menu,
 } from "lucide-react";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+  SheetClose,
+} from "@/components/ui/sheet";
 import { WhatsAppFloat } from "@/components/site/WhatsAppFloat";
+import { GalleryGrid } from "@/components/site/GalleryGrid";
 import logo from "@/assets/logo.jpeg";
 import hero from "@/assets/hero-poultry.jpg";
 import imgBroilers from "@/assets/broilers.jpg";
@@ -21,6 +31,18 @@ import imgLayers from "@/assets/layers.jpg";
 import imgTurkeys from "@/assets/turkeys.jpg";
 import imgChicks from "@/assets/chicks.jpg";
 import imgIncubation from "@/assets/incubation.jpg";
+import videoFarmVisit from "@/assets/farm-visit.mp4";
+import videoIncubation from "@/assets/incubation.mp4";
+import farmOwner from "@/assets/farm-owner.png";
+import poultryExpert from "@/assets/poultry-expert.jpg";
+import userIcon from "@/assets/user-icon.png";
+import malayChicken from "@/assets/gallery/photo-9a.jpg";
+import seramaChicken from "@/assets/gallery/serama.jpeg";
+import brahmaChickens from "@/assets/gallery/photo-10a.jpg";
+import lightBrahmaVariety from "@/assets/gallery/photo-11a.jpg";
+import plymouthRockRooster from "@/assets/gallery/photo-3b.jpg";
+import whiteHollandTurkey from "@/assets/gallery/photo-6b.jpg";
+import helmetedGuineaFowl from "@/assets/gallery/photo-7a.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -38,20 +60,20 @@ export const Route = createFileRoute("/")({
 
 // Replace placeholders with real handles when available
 const SOCIALS = {
-  whatsapp: "https://wa.me/254700000000",
-  whatsappNumber: "+254 700 000 000",
-  email: "info@kogogofarm.co.ke",
+  whatsapp: "https://wa.me/254724844696",
+  whatsappNumber: "+254 724 844 696",
+  email: "info@thekogogofarm.co.ke",
   x: "https://x.com/kogogofarm",
   instagram: "https://instagram.com/kogogofarm",
-  tiktok: "https://tiktok.com/@kogogofarm",
+  tiktok: "https://www.tiktok.com/@the.kogogofarmsiaya?_r=1&_t=ZS-9795gipP0bs",
 };
 
 const PRODUCTS = [
   {
-    id: "broilers", name: "Broilers", img: imgBroilers,
-    desc: "Fast-growing meat chickens raised on clean feed for tender, juicy meat.",
+    id: "Hybrid", name: "Hybrid Roosters", img: imgBroilers,
+    desc: "Fast-growing breeding and meat chickens raised on clean feed for tender, juicy meat.",
     sizes: [
-      { label: "Small (1.2–1.5 kg)", was: 700, now: 550 },
+      { label: "Small (1.2–1.5 kg)", was: 700, now: 650 },
       { label: "Medium (1.6–2.0 kg)", was: 950, now: 800 },
       { label: "Large (2.1–2.5 kg)", was: 1300, now: 1100 },
     ],
@@ -103,10 +125,13 @@ const PRODUCTS = [
 ];
 
 const BREEDS = [
-  "Cobb 500 Broilers", "Ross 308 Broilers",
-  "Isa Brown Layers", "Lohmann Brown Layers",
-  "KARI Improved Kienyeji", "Kuroiler",
-  "Black Australorp", "Broad-Breasted Bronze Turkey", "Beltsville White Turkey",
+  { name: "Malay Chicken", img: malayChicken, desc: "Tall, powerful heritage chickens known for their striking build and premium meat quality." },
+  { name: "Serama Chicken", img: seramaChicken, desc: "Small, elegant ornamental chickens prized for their confident posture and charming temperament." },
+  { name: "Brahma Chickens", img: brahmaChickens, desc: "Gentle giant chickens with feathered legs, calm nature, and excellent family-farm appeal." },
+  { name: "Light Brahma Variety", img: lightBrahmaVariety, desc: "A beautiful Brahma variety with bold contrast, steady temperament, and impressive size." },
+  { name: "Plymouth Rock Rooster", img: plymouthRockRooster, desc: "A hardy rooster with distinctive barred plumage and strong breeding qualities." },
+  { name: "White Holland Turkey", img: whiteHollandTurkey, desc: "A clean white turkey variety raised for good growth, tender meat, and farm presence." },
+  { name: "Helmeted Guinea Fowl", img: helmetedGuineaFowl, desc: "Active foragers valued for pest control, nutritious meat, and distinctive spotted plumage." },
 ];
 
 const BENEFITS = [
@@ -116,8 +141,123 @@ const BENEFITS = [
   { icon: Leaf, title: "Naturally Raised", text: "Clean feed and humane housing — no shortcuts, just healthy birds." },
 ];
 
+const TESTIMONIALS = [
+  {
+    name: "Martha, Local Farmer",
+    quote: "The Kogogo Farm team helped me choose the right breeds and my flock is healthier than ever.",
+  },
+  {
+    name: "John, Restaurant Owner",
+    quote: "Fresh poultry delivered on time with consistent quality — customers keep coming back.",
+  },
+  {
+    name: "Grace, Poultry Enthusiast",
+    quote: "Their consultation service gave me confidence to start my own small farm business.",
+  },
+];
+
 function formatKsh(n: number) {
   return "Ksh " + n.toLocaleString("en-KE");
+}
+
+function About() {
+  const slides = [hero, imgLayers, imgBroilers];
+  const team = [
+    {
+      name: "Mr.Julius Ogogoh",
+      role: "Farm Owner",
+      img: farmOwner,
+      bio: "Leads Kogogo Farm with a focus on healthy birds, sustainable farming and long-term trust in every delivery.",
+    },
+    {
+      name: "Mr.Ojwang'",
+      role: "Poultry Expert",
+      img: poultryExpert,
+      bio: "Oversees bird welfare, nutrition and flock health to keep every batch strong and market-ready.",
+    },
+    {
+      name: "Mr.Evans",
+      role: "Operations Lead",
+      img: userIcon,
+      bio: "Manages farm logistics and customer orders so every delivery arrives fresh and on schedule.",
+    },
+  ];
+
+  return (
+    <section id="about" className="relative overflow-hidden py-24">
+      <div className="about-slideshow absolute inset-0 -z-10">
+        {slides.map((src, index) => (
+          <div
+            key={src}
+            className="about-slide"
+            style={{ backgroundImage: `url(${src})`, animationDelay: `${index * 5}s` }}
+          />
+        ))}
+        <div className="absolute inset-0 bg-emerald-950/65" />
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4">
+        <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr] items-start">
+          <div className="rounded-[2rem] border border-emerald-200/10 bg-emerald-950/85 p-10 shadow-[0_30px_90px_-40px_rgba(7,89,50,0.55)] text-white">
+            <span className="text-xs uppercase tracking-[0.3em] text-emerald-200/70">About Kogogo Farm</span>
+            <h2 className="mt-4 text-4xl font-display font-bold leading-tight text-white sm:text-5xl">A modern poultry farm with a heart for quality.</h2>
+            <p className="mt-6 max-w-3xl text-base leading-8 text-emerald-100/90 md:text-lg">
+              The Kogogo Farm is about Kuku for you — providing the best, healthy and well reared poultry. Whether it is for commercial or family consumption, or you are just a lover of poultry, this is the place to find tender birds, trustworthy service and real farming expertise.
+            </p>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              <div className="rounded-3xl border border-emerald-300/15 bg-emerald-900/40 p-6">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-200">
+                  <Leaf className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-semibold text-white">Mission</h3>
+                <p className="mt-3 text-sm text-emerald-100/70">Provide healthy poultry, ethical care, and reliable support to every Kenyan family and business.</p>
+              </div>
+              <div className="rounded-3xl border border-emerald-300/15 bg-emerald-900/40 p-6">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-200">
+                  <Sparkles className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-semibold text-white">Vision</h3>
+                <p className="mt-3 text-sm text-emerald-100/70">A region where fresh poultry is trusted, accessible and farmed with pride.</p>
+              </div>
+              <div className="rounded-3xl border border-emerald-300/15 bg-emerald-900/40 p-6">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-emerald-200">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <h3 className="mt-5 font-semibold text-white">Promise</h3>
+                <p className="mt-3 text-sm text-emerald-100/70">Consistent quality, responsive service, and poultry raised with care.</p>
+              </div>
+            </div>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <a href="#contact">
+                <Button className="animated-gradient-button text-white">Contact Us</Button>
+              </a>
+              <a href="#breeds">
+                <Button className="text-white bg-white/10 border border-white/20 hover:bg-white/20 hover:border-white/30">Explore Breeds</Button>
+              </a>
+            </div>
+          </div>
+
+          <div className="grid gap-5">
+            {team.map((member) => (
+              <div key={member.name} className="group overflow-hidden rounded-[2rem] border border-emerald-300/15 bg-emerald-950/80 shadow-[0_24px_90px_-50px_rgba(7,89,50,0.55)] transition hover:-translate-y-1">
+                <div className="relative h-56 overflow-hidden">
+                  <img src={member.img} alt={member.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-linear-to-t from-emerald-950/90 via-transparent to-transparent" />
+                </div>
+                <div className="p-6 text-white">
+                  <div className="text-sm uppercase tracking-[0.25em] text-emerald-200/70">{member.role}</div>
+                  <h3 className="mt-3 text-2xl font-semibold">{member.name}</h3>
+                  <p className="mt-3 text-sm leading-7 text-emerald-100/70">{member.bio}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
 
 function Home() {
@@ -129,7 +269,10 @@ function Home() {
       <Hero />
       <Trust />
       <Products />
+      <Services />
       <Breeds />
+      <About />
+      <Gallery />
       <Benefits />
       <Location />
       <FAQ />
@@ -140,6 +283,40 @@ function Home() {
 }
 
 function Header() {
+  const [activeSection, setActiveSection] = useState("products");
+
+  useEffect(() => {
+    const sections = ["products", "breeds", "about", "gallery", "benefits", "location", "contact"];
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 100;
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const { offsetTop, offsetHeight } = el;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLink = (href: string, label: string) => (
+    <a
+      href={href}
+      className={`transition-colors ${
+        activeSection === href.slice(1)
+          ? "text-primary font-semibold border-b-2 border-primary pb-1"
+          : "hover:text-primary"
+      }`}
+    >
+      {label}
+    </a>
+  );
+
   return (
     <header className="sticky top-0 z-40 backdrop-blur bg-background/80 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -151,49 +328,252 @@ function Header() {
           </div>
         </a>
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-          <a href="#products" className="hover:text-primary">Products</a>
-          <a href="#breeds" className="hover:text-primary">Breeds</a>
-          <a href="#benefits" className="hover:text-primary">Benefits</a>
-          <a href="#location" className="hover:text-primary">Location</a>
-          <a href="#faq" className="hover:text-primary">FAQ</a>
-          <a href="#contact" className="hover:text-primary">Contact</a>
+          {navLink("#products", "Products")}
+          {navLink("#breeds", "Breeds")}
+          {navLink("#about", "About")}
+          {navLink("#gallery", "Gallery")}
+          {navLink("#benefits", "Benefits")}
+          {navLink("#location", "Location")}
+          {navLink("#contact", "Contact")}
         </nav>
-        <a href="#contact">
-          <Button className="bg-primary hover:bg-primary/90">Order Now</Button>
-        </a>
+
+        <div className="flex items-center gap-2">
+          <a href="#contact" className="hidden md:inline-block">
+            <Button className="animated-gradient-button text-white shadow-[var(--shadow-soft)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+              Order Now
+            </Button>
+          </a>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="md:hidden">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Open navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="max-w-[21rem] rounded-3xl border border-border bg-background/95 p-6 shadow-[var(--shadow-soft)] backdrop-blur-xl">
+              <SheetHeader className="pb-4">
+                <SheetTitle className="text-lg font-semibold">Navigation</SheetTitle>
+                <SheetDescription className="text-sm text-muted-foreground">
+                  Jump to any section of the site.
+                </SheetDescription>
+              </SheetHeader>
+
+              <div className="space-y-2 pt-4">
+                <SheetClose asChild>
+                  <a href="#products" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "products"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Products
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href="#breeds" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "breeds"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Breeds
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href="#gallery" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "gallery"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Gallery
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href="#benefits" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "benefits"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Benefits
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href="#location" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "location"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Location
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href="#contact" className={`block rounded-xl px-4 py-3 text-base font-medium transition-colors ${
+                    activeSection === "contact"
+                      ? "bg-primary/20 text-primary font-semibold"
+                      : "text-foreground hover:bg-secondary/60"
+                  }`}>
+                    Contact
+                  </a>
+                </SheetClose>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <SheetClose asChild>
+                  <a href="#contact" className="block">
+                      <Button className="w-full animated-gradient-button text-white shadow-[var(--shadow-soft)] transition-transform duration-300 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60">
+                        Order Now
+                      </Button>
+                  </a>
+                </SheetClose>
+                <SheetClose asChild>
+                  <a href={SOCIALS.whatsapp} target="_blank" rel="noopener noreferrer" className="block">
+                    <Button variant="outline" className="w-full">WhatsApp Order</Button>
+                  </a>
+                </SheetClose>
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
     </header>
   );
 }
 
+const HERO_SLIDES = [
+  {
+    id: "welcome",
+    title: "Welcome to Kogogo Farm",
+    subtitle: "Fresh poultry, trusted farming support, local to Siaya.",
+    description:
+      "Delivering premium broilers, healthy layers, and reliable poultry advice with care for every customer.",
+    button: "Explore the farm",
+    href: "#products",
+    image: hero,
+  },
+  {
+    id: "about",
+    title: "About us",
+    subtitle: "A local farm built on trust and consistent quality.",
+    description:
+      "Kogogo Farm brings ethical poultry production to Siaya — from free-range broilers to trusted farming advice for Kenyan households.",
+    button: "Learn more",
+    href: "#about",
+    image: imgLayers,
+  },
+  {
+    id: "services",
+    title: "Services",
+    subtitle: "Farm visits, flock selection, consultations and hatchery support.",
+    description:
+      "Book a farm tour, choose the right flock, get expert poultry consultations, or incubate eggs with confidence.",
+    button: "Talk to us",
+    href: "#services",
+    image: imgBroilers,
+  },
+  {
+    id: "testimonials",
+    title: "Testimonials",
+    subtitle: "See why customers keep choosing Kogogo Farm.",
+    description:
+      "Fresh poultry, dependable delivery, and hands-on support — heard directly from our satisfied customers.",
+    button: "See what people say",
+    href: "#testimonials",
+    image: imgTurkeys,
+  },
+];
+
 function Hero() {
+  const heroRef = useRef<HTMLElement>(null);
+  const slideRefs = useRef<Array<HTMLDivElement | null>>([]);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (!heroRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.2 }
+    );
+
+    observer.observe(heroRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % HERO_SLIDES.length);
+    }, 7500);
+    return () => window.clearInterval(interval);
+  }, [isPaused]);
+
+  useEffect(() => {
+    const element = slideRefs.current[activeSlide];
+    // Only auto-scroll slides when the hero section is still near the top
+    const heroEl = heroRef.current;
+    if (!element || !heroEl) return;
+    const rect = heroEl.getBoundingClientRect();
+    const heroNearTop = rect.top >= -50 && rect.top <= 200;
+    if (heroNearTop) {
+      element.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+    }
+  }, [activeSlide]);
+
   return (
-    <section id="top" className="relative isolate overflow-hidden">
-      <img src={hero} alt="Healthy free-range chickens at The Kogogo Farm in Siaya" className="absolute inset-0 h-full w-full object-cover" width={1600} height={1024} />
-      <div className="absolute inset-0" style={{ background: "var(--gradient-hero)" }} />
-      <div className="relative max-w-7xl mx-auto px-4 py-24 md:py-36 text-white">
-        <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur px-3 py-1 text-xs uppercase tracking-widest">
-          <Sparkles className="h-3.5 w-3.5" /> Healthy & Fresh · Siaya, Kenya
-        </span>
-        <h1 className="mt-5 font-display text-4xl md:text-6xl font-bold max-w-3xl leading-tight">
-          Premium Broilers, Layers, Turkeys & Chicks — Straight From The Kogogo Farm.
-        </h1>
-        <p className="mt-5 max-w-2xl text-base md:text-lg text-white/85">
-          Vaccinated, naturally-raised poultry and expert farming consultations.
-          Order fresh from Siaya today and taste the Kogogo difference.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a href="#products">
-            <Button size="lg" className="bg-gold text-gold-foreground hover:bg-gold/90 shadow-[var(--shadow-glow)]">
-              Shop Poultry
-            </Button>
-          </a>
-          <a href={SOCIALS.whatsapp} target="_blank" rel="noopener noreferrer">
-            <Button size="lg" variant="outline" className="bg-white/10 border-white/40 text-white hover:bg-white/20">
-              WhatsApp Order
-            </Button>
-          </a>
+    <section id="top" ref={heroRef} className="relative isolate overflow-hidden bg-slate-950">
+      <div className="relative">
+        <div className="no-scrollbar flex min-h-[720px] snap-x snap-mandatory overflow-x-auto scroll-smooth cursor-grab active:cursor-grabbing" onMouseEnter={() => setIsPaused(true)} onMouseLeave={() => setIsPaused(false)}>
+          {HERO_SLIDES.map((slide, index) => (
+            <div
+              key={slide.id}
+              ref={(element) => (slideRefs.current[index] = element)}
+              className="snap-center relative min-w-full overflow-hidden"
+            >
+              <img src={slide.image} alt={slide.title} className="absolute inset-0 h-full w-full object-cover brightness-[0.55]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/75" />
+              <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-center px-6 py-24 text-white sm:px-10 lg:px-16">
+                <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-white/90 backdrop-blur-sm">
+                  <Sparkles className="h-4 w-4" />{slide.id === "welcome" ? "Welcome" : slide.title}
+                </span>
+                <h1 className="mt-8 max-w-3xl text-4xl font-display font-bold leading-tight text-white md:text-6xl">
+                  {slide.subtitle}
+                </h1>
+                <p className="mt-6 max-w-2xl text-base text-white/80 md:text-lg">
+                  {slide.description}
+                </p>
+                <div className="mt-10 flex flex-wrap gap-4">
+                  <a href={slide.href} className="inline-block">
+                    <Button size="lg" className="animated-gradient-button text-white">
+                      {slide.button}
+                    </Button>
+                  </a>
+                  <a href={SOCIALS.whatsapp} target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <Button size="lg" variant="outline" className="whatsapp-cta bg-white/10 border-white/40 text-white hover:bg-white/20">
+                      WhatsApp Order
+                    </Button>
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
+      </div>
+
+      <div className="absolute inset-x-0 bottom-8 flex justify-center gap-3">
+        {HERO_SLIDES.map((_, index) => (
+          <button
+            key={`dot-${index}`}
+            type="button"
+            aria-label={`Show ${HERO_SLIDES[index].title}`}
+            onClick={() => setActiveSlide(index)}
+            className={`h-3 w-3 rounded-full transition-colors ${activeSlide === index ? "bg-white" : "bg-white/30"}`}
+          />
+        ))}
       </div>
     </section>
   );
@@ -221,7 +601,8 @@ function Trust() {
 
 function Products() {
   return (
-    <section id="products" className="py-20 md:py-28">
+    <section id="products" className="relative py-20 md:py-28">
+      <div id="services" className="absolute -top-24" aria-hidden="true" />
       <div className="max-w-7xl mx-auto px-4">
         <SectionHead eyebrow="Our Products & Services" title="Quality poultry, fair prices." sub="Limited-time launch discounts. All prices in Kenya Shillings." />
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -256,21 +637,163 @@ function Products() {
   );
 }
 
-function Breeds() {
+function Services() {
+  const incubationSteps = [
+    { stage: "Bring Eggs", description: "Client brings fertile eggs to the farm for incubation" },
+    { stage: "Incubation Period", description: "Eggs incubate for 21 days in controlled temperature & humidity" },
+    { stage: "Hatching", description: "Eggs hatch and chicks emerge healthy and vigorous" },
+    { stage: "Pick Up", description: "Collect your healthy day-old chicks ready to grow" },
+  ];
+
   return (
-    <section id="breeds" className="py-20 bg-secondary/40 border-y border-border">
+    <section id="services" className="py-20 md:py-28">
       <div className="max-w-7xl mx-auto px-4">
-        <SectionHead eyebrow="Breeds We Rear" title="Carefully selected, proven performers." sub="Each breed is raised with care to deliver the best meat or egg yield for Kenyan farmers and households." />
-        <div className="mt-10 flex flex-wrap gap-3 justify-center">
-          {BREEDS.map((b) => (
-            <span key={b} className="rounded-full bg-card border border-border px-4 py-2 text-sm font-medium text-secondary-foreground shadow-sm">
-              {b}
-            </span>
+        <SectionHead eyebrow="Our Services" title="Professional poultry services." sub="Expert support from farm visits to full egg incubation." />
+        
+        <div className="mt-16 grid gap-8 lg:grid-cols-2">
+          {/* Farm Visits & Poultry Selection */}
+          <article className="group rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-soft)] hover:-translate-y-1 transition-transform">
+            <div className="relative h-64 overflow-hidden bg-slate-900">
+              <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60 z-0">
+                <source src={videoFarmVisit} type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/50 via-slate-900/20 to-transparent z-0" />
+
+              {/* Overlay: title, description, button */}
+              <div className="absolute inset-0 flex items-end md:items-center z-10">
+                <div className="w-full md:mx-6 md:my-6 max-w-2xl rounded-none md:rounded-xl bg-background/40 p-4 md:p-6 backdrop-blur-sm md:backdrop-blur-md text-foreground">
+                  <h3 className="font-display text-lg md:text-2xl font-semibold">Farm Visits & Poultry Selection</h3>
+                  <p className="mt-2 text-xs md:text-sm text-muted-foreground">
+                    Get expert guidance on selecting the right poultry breeds and stock for your needs. Our team helps you choose healthy birds suited to your farming goals.
+                  </p>
+                  <div className="mt-4 md:mt-6">
+                    <a href={`${SOCIALS.whatsapp}?text=${encodeURIComponent("Hi Kogogo Farm, I'd like to book a farm visit and get poultry selection guidance. Please let me know available slots.")}`} target="_blank" rel="noopener noreferrer">
+                      <Button className="bg-primary">Book a Slot</Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <ul className="mt-2 space-y-3 text-sm">
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>Expert breed recommendation</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>Health assessment of stock</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold">✓</span>
+                  <span>Personalized farming advice</span>
+                </li>
+              </ul>
+            </div>
+          </article>
+
+          {/* Incubation Services */}
+          <article className="group rounded-xl border border-border bg-card overflow-hidden shadow-[var(--shadow-soft)] hover:-translate-y-1 transition-transform">
+            <div className="relative h-64 overflow-hidden bg-slate-900">
+              <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-60 z-0">
+                <source src={videoIncubation} type="video/mp4" />
+              </video>
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-900/50 via-slate-900/20 to-transparent z-0" />
+
+              {/* Overlay: title, short description & button */}
+              <div className="absolute inset-0 flex items-end md:items-center z-10">
+                <div className="w-full md:mx-6 md:my-6 max-w-2xl rounded-none md:rounded-xl bg-background/40 p-4 md:p-6 backdrop-blur-sm md:backdrop-blur-md text-foreground">
+                  <h3 className="font-display text-lg md:text-2xl font-semibold">Egg Incubation Services</h3>
+                  <p className="mt-2 text-xs md:text-sm text-muted-foreground">Professional egg incubation with controlled temperature, humidity, and expert care from start to healthy hatch.</p>
+                  <div className="mt-4 md:mt-6">
+                    <a href={`${SOCIALS.whatsapp}?text=${encodeURIComponent("Hi Kogogo Farm, I'm interested in your egg incubation services. I'd like to inquire about available slots and pricing.")}`} target="_blank" rel="noopener noreferrer">
+                      <Button className="bg-primary">Inquire for Slot</Button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-8">
+              <div className="mt-6 space-y-4">
+                <div className="text-sm font-semibold text-primary uppercase tracking-[0.1em]">Incubation Process</div>
+                <div className="grid gap-3">
+                  {incubationSteps.map((step, index) => (
+                    <div key={index} className="flex items-start gap-3 pb-3 border-b border-border last:border-0">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary shrink-0">
+                        {index + 1}
+                      </div>
+                      <div>
+                        <div className="font-medium text-foreground">{step.stage}</div>
+                        <div className="text-xs text-muted-foreground">{step.description}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Breeds() {
+  const breedsRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!breedsRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      { threshold: 0.25 },
+    );
+
+    observer.observe(breedsRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section id="breeds" ref={breedsRef} className="py-20 bg-secondary/40 border-y border-border">
+      <div className="max-w-7xl mx-auto px-4">
+        <SectionHead eyebrow="Breeds We Rear" title="Our Birds of Gold" sub="Each breed is raised with care to deliver the best meat or egg yield for Kenyan farmers and households." />
+        <div className={`mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"} transition-all duration-700 ease-out`}>
+          {BREEDS.map((breed) => (
+            <article key={breed.name} className="group flex h-full flex-col overflow-hidden rounded-[2rem] border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-500 hover:-translate-y-2 hover:shadow-[0_30px_80px_-35px_rgba(0,0,0,0.25)]">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900/10">
+                <img loading="eager" decoding="async" src={breed.img} alt={breed.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
+                <div className="absolute left-4 top-4 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs uppercase tracking-[0.24em] text-white backdrop-blur-sm">
+                  Breed
+                </div>
+              </div>
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="text-xl font-semibold text-foreground">{breed.name}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">{breed.desc}</p>
+                <a
+                  href={`${SOCIALS.whatsapp}?text=${encodeURIComponent("Hi Kogogo Farm, I'm interested in the " + breed.name + " breed. Could you share availability and price?")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 block sm:mt-auto sm:pt-6"
+                >
+                  <Button className="w-full bg-primary hover:bg-primary/90">Inquire</Button>
+                </a>
+              </div>
+            </article>
           ))}
         </div>
       </div>
     </section>
   );
+}
+
+function Gallery() {
+  return <GalleryGrid />;
 }
 
 function Benefits() {
@@ -286,6 +809,24 @@ function Benefits() {
               </div>
               <h3 className="mt-4 font-display text-lg font-semibold">{title}</h3>
               <p className="mt-2 text-sm text-muted-foreground">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section id="testimonials" className="py-20 bg-secondary/40 border-y border-border">
+      <div className="max-w-7xl mx-auto px-4">
+        <SectionHead eyebrow="Testimonials" title="What customers say about Kogogo Farm." sub="Fresh poultry, trusted service and expert farm guidance — heard directly from our customers." />
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {TESTIMONIALS.map((item) => (
+            <div key={item.name} className="rounded-[2rem] border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-300 hover:-translate-y-1 hover:border-primary/40">
+              <p className="text-sm leading-7 text-muted-foreground">“{item.quote}”</p>
+              <div className="mt-5 font-semibold text-foreground">{item.name}</div>
             </div>
           ))}
         </div>
