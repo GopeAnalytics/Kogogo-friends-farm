@@ -16,8 +16,7 @@ const galleryImages = import.meta.glob("../../assets/gallery/*.jpg", {
   import: "default",
 }) as Record<string, string>;
 
-const galleryImage = (fileName: string) =>
-  galleryImages[`../../assets/gallery/${fileName}`];
+const galleryImage = (fileName: string) => galleryImages[`../../assets/gallery/${fileName}`];
 
 const photoSet = (photoNumber: number) =>
   ["a", "b", "c"].map((suffix) => galleryImage(`photo-${photoNumber}${suffix}.jpg`));
@@ -37,92 +36,107 @@ const GALLERY_ITEMS: GalleryItem[] = [
   {
     id: "photo-1",
     title: "Battery Cage Housing",
-    description: "Modern battery cage housing system designed for optimal layer welfare and egg production efficiency. Features well-ventilated compartments and automated feeding systems.",
+    description:
+      "Modern battery cage housing system designed for optimal layer welfare and egg production efficiency. Features well-ventilated compartments and automated feeding systems.",
     images: photoSet(1),
   },
   {
     id: "photo-2",
     title: "Our Layers at 2 Months Old",
-    description: "Healthy and vibrant layer chickens at 2 months of age. At this stage, they show excellent feather development and strong body composition, preparing them for productive laying cycles.",
+    description:
+      "Healthy and vibrant layer chickens at 2 months of age. At this stage, they show excellent feather development and strong body composition, preparing them for productive laying cycles.",
     images: photoSet(2),
   },
   {
     id: "photo-3",
     title: "Barred Plymouth Rock Rooster",
-    description: "A magnificent Barred Plymouth Rock rooster displaying the breed's distinctive black and white barred plumage. Known for their friendly temperament and excellent laying traits in hens.",
+    description:
+      "A magnificent Barred Plymouth Rock rooster displaying the breed's distinctive black and white barred plumage. Known for their friendly temperament and excellent laying traits in hens.",
     images: photoSet(3),
   },
   {
     id: "photo-4",
     title: "Turken & Isa Brown Roosters",
-    description: "Featuring a striking Turken (Naked Neck) rooster alongside an Isa Brown rooster. The Turken's unique featherless neck gives it superior heat dissipation, while Isa Browns are renowned for exceptional egg production.",
+    description:
+      "Featuring a striking Turken (Naked Neck) rooster alongside an Isa Brown rooster. The Turken's unique featherless neck gives it superior heat dissipation, while Isa Browns are renowned for exceptional egg production.",
     images: photoSet(4),
   },
   {
     id: "photo-5",
     title: "White Leghorn",
-    description: "The elegant White Leghorn breed, one of the most prolific egg layers in the world. These birds are known for their energy, alertness, and ability to produce up to 300+ eggs per year.",
+    description:
+      "The elegant White Leghorn breed, one of the most prolific egg layers in the world. These birds are known for their energy, alertness, and ability to produce up to 300+ eggs per year.",
     images: photoSet(5),
   },
   {
     id: "photo-6",
     title: "White Holland Turkey",
-    description: "A beautiful White Holland Turkey, prized for its pure white plumage and tender meat. These turkeys grow rapidly and are ideal for family gatherings and restaurant supply.",
+    description:
+      "A beautiful White Holland Turkey, prized for its pure white plumage and tender meat. These turkeys grow rapidly and are ideal for family gatherings and restaurant supply.",
     images: photoSet(6),
   },
   {
     id: "photo-7",
     title: "Helmeted Guinea Fowls",
-    description: "Our flock of Helmeted Guinea Fowls with their characteristic helmet-like casques and spotted plumage. These birds are excellent for tick and pest control while providing nutritious meat and eggs.",
+    description:
+      "Our flock of Helmeted Guinea Fowls with their characteristic helmet-like casques and spotted plumage. These birds are excellent for tick and pest control while providing nutritious meat and eggs.",
     images: photoSet(7),
   },
   {
     id: "photo-8",
     title: "Hybrid Rooster",
-    description: "A robust hybrid rooster bred for superior performance and hardiness. These roosters combine the best traits from multiple breeds for improved meat quality and disease resistance.",
+    description:
+      "A robust hybrid rooster bred for superior performance and hardiness. These roosters combine the best traits from multiple breeds for improved meat quality and disease resistance.",
     images: photoSet(8),
   },
   {
     id: "photo-9",
     title: "Malay Chicken",
-    description: "Did you know? The Malay chicken is one of the largest and heaviest chicken breeds, originally from Southeast Asia. They are known for their powerful physique, long legs, and aggressive behavior. Malays are primarily ornamental but also produce excellent meat quality.",
+    description:
+      "Did you know? The Malay chicken is one of the largest and heaviest chicken breeds, originally from Southeast Asia. They are known for their powerful physique, long legs, and aggressive behavior. Malays are primarily ornamental but also produce excellent meat quality.",
     images: photoSet(9),
     badge: "Did You Know?",
   },
   {
     id: "photo-10",
     title: "Brahma Chickens",
-    description: "Our impressive flock of Brahma chickens, one of the giant chicken breeds. These gentle giants feature feathered legs and feet, excellent brooding abilities, and can weigh over 3.5 kg when fully grown.",
+    description:
+      "Our impressive flock of Brahma chickens, one of the giant chicken breeds. These gentle giants feature feathered legs and feet, excellent brooding abilities, and can weigh over 3.5 kg when fully grown.",
     images: photoSet(10),
   },
   {
     id: "photo-11",
     title: "Light Brahma Variety",
-    description: "The Light Brahma variety showcases the elegant contrast of white and black feathering. These massive birds have exceptional temperament, making them perfect for family farms. They're cold-hardy, broody, and excellent mothers, capable of hatching and raising large numbers of chicks.",
+    description:
+      "The Light Brahma variety showcases the elegant contrast of white and black feathering. These massive birds have exceptional temperament, making them perfect for family farms. They're cold-hardy, broody, and excellent mothers, capable of hatching and raising large numbers of chicks.",
     images: photoSet(11),
   },
   {
     id: "photo-12",
     title: "Rhode Island Red",
-    description: "A robust Rhode Island Red chicken from our premium flock. This breed is legendary for exceptional egg production and meat quality. Known for their deep red plumage, hardiness, and ability to adapt to various climates.",
+    description:
+      "A robust Rhode Island Red chicken from our premium flock. This breed is legendary for exceptional egg production and meat quality. Known for their deep red plumage, hardiness, and ability to adapt to various climates.",
     images: photoSet(12),
   },
   {
     id: "photo-13",
     title: "Our Layers Feeding",
-    description: "Our layer flock enjoying their premium feed. Proper nutrition is crucial for optimal egg production and bird health. We provide balanced, high-quality feed tailored to support consistent egg yield and strong immune systems.",
+    description:
+      "Our layer flock enjoying their premium feed. Proper nutrition is crucial for optimal egg production and bird health. We provide balanced, high-quality feed tailored to support consistent egg yield and strong immune systems.",
     images: photoSet(13),
   },
   {
     id: "photo-14",
     title: "White Leghorn Cross Rooster",
-    description: "A stunning White Leghorn cross rooster displaying the breed's characteristic alert posture and pristine white plumage. These roosters are spirited, active, and known for their vigilance and protective nature.",
+    description:
+      "A stunning White Leghorn cross rooster displaying the breed's characteristic alert posture and pristine white plumage. These roosters are spirited, active, and known for their vigilance and protective nature.",
     images: photoSet(14),
   },
   {
     id: "photo-15",
     title: "Incubation & Hatchery",
-    description: "Our state-of-the-art incubation and hatchery facility where we carefully manage temperature, humidity, and ventilation for optimal chick development. Watch fresh chicks hatch daily from fertile eggs collected from healthy parent flocks.",
+    description:
+      "Our state-of-the-art incubation and hatchery facility where we carefully manage temperature, humidity, and ventilation for optimal chick development. Watch fresh chicks hatch daily from fertile eggs collected from healthy parent flocks.",
     images: photoSet(15),
   },
 ];
@@ -131,7 +145,8 @@ const VIDEOS: GalleryItem[] = [
   {
     id: "video-1",
     title: "Our Layers Feeding",
-    description: "Watch our healthy layer flock enjoying their premium feed. This video showcases their vitality and appetite, reflecting the quality care we provide daily.",
+    description:
+      "Watch our healthy layer flock enjoying their premium feed. This video showcases their vitality and appetite, reflecting the quality care we provide daily.",
     images: [galleryImage("photo-13a.jpg")],
     isVideo: true,
     videoId: "WRq6jBOBXQ0",
@@ -140,7 +155,8 @@ const VIDEOS: GalleryItem[] = [
   {
     id: "video-2",
     title: "Layers Stock",
-    description: "Comprehensive view of our productive layer stock in their housing environment. See how we maintain optimal conditions for consistent egg production.",
+    description:
+      "Comprehensive view of our productive layer stock in their housing environment. See how we maintain optimal conditions for consistent egg production.",
     images: [galleryImage("photo-2a.jpg")],
     isVideo: true,
     videoId: "3Uk0JeY1it0",
@@ -149,7 +165,8 @@ const VIDEOS: GalleryItem[] = [
   {
     id: "video-3",
     title: "Light Brahma Feeding",
-    description: "Our magnificent Light Brahma chickens enjoying feeding time. See their size and gentle nature as they feast on quality nutrition.",
+    description:
+      "Our magnificent Light Brahma chickens enjoying feeding time. See their size and gentle nature as they feast on quality nutrition.",
     images: [galleryImage("photo-11a.jpg")],
     isVideo: true,
     videoId: "AX0g4zfIYGM",
@@ -158,7 +175,8 @@ const VIDEOS: GalleryItem[] = [
   {
     id: "video-4",
     title: "Helmeted Guinea Fowl",
-    description: "Watch our flock of Helmeted Guinea Fowls in action. These birds are excellent foragers and pest controllers, adding value to any farm.",
+    description:
+      "Watch our flock of Helmeted Guinea Fowls in action. These birds are excellent foragers and pest controllers, adding value to any farm.",
     images: [galleryImage("photo-7a.jpg")],
     isVideo: true,
     videoId: "BIZ1dX09jZM",
@@ -181,7 +199,8 @@ export function GalleryGrid() {
             See our farm through pictures and video.
           </p>
           <p className="mx-auto max-w-2xl text-sm text-muted-foreground sm:text-base">
-            Explore our diverse poultry breeds, modern facilities, and farm operations through our photo and video gallery.
+            Explore our diverse poultry breeds, modern facilities, and farm operations through our
+            photo and video gallery.
           </p>
         </div>
 
@@ -342,15 +361,8 @@ interface GalleryModalProps {
   onImageIndexChange: (index: number) => void;
 }
 
-function GalleryModal({
-  item,
-  onClose,
-  currentImageIndex,
-  onImageIndexChange,
-}: GalleryModalProps) {
-  const plugin = React.useRef(
-    Autoplay({ delay: 4000, stopOnInteraction: true })
-  );
+function GalleryModal({ item, onClose, currentImageIndex, onImageIndexChange }: GalleryModalProps) {
+  const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -420,7 +432,9 @@ function GalleryModal({
 
               {!item.isVideo && (
                 <div className="mt-8">
-                  <h3 className="font-semibold text-foreground mb-3">Photos ({item.images.length})</h3>
+                  <h3 className="font-semibold text-foreground mb-3">
+                    Photos ({item.images.length})
+                  </h3>
                   <div className="grid grid-cols-3 gap-2">
                     {item.images.map((image, idx) => (
                       <button
