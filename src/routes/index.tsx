@@ -679,7 +679,9 @@ function Hero() {
           {HERO_SLIDES.map((slide, index) => (
             <div
               key={slide.id}
-              ref={(element) => (slideRefs.current[index] = element)}
+              ref={(element) => {
+                slideRefs.current[index] = element;
+              }}
               className="snap-center relative min-w-full overflow-hidden"
             >
               <img
