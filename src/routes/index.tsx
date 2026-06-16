@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Suspense, lazy } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -163,6 +164,8 @@ const PRODUCTS = [
     ],
   },
 ];
+
+const TripPlanner = lazy(() => import("@/components/TripPlanner"));
 
 const BREEDS = [
   {
@@ -679,7 +682,9 @@ function Hero() {
           {HERO_SLIDES.map((slide, index) => (
             <div
               key={slide.id}
-              ref={(element) => (slideRefs.current[index] = element)}
+              ref={(element) => {
+                slideRefs.current[index] = element;
+              }}
               className="snap-center relative min-w-full overflow-hidden"
             >
               <img
@@ -1114,7 +1119,7 @@ function Location() {
           </ul>
           <div className="mt-6 flex gap-3">
             <a
-              href="https://www.google.com/maps?q=Siaya+Town,+Kenya"
+              href="https://www.google.com/maps/dir/?api=1&destination=-1.2921,36.8219&travelmode=driving"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -1125,14 +1130,19 @@ function Location() {
             </a>
           </div>
         </div>
-        <div className="rounded-xl overflow-hidden border border-border shadow-[var(--shadow-soft)]">
-          <iframe
-            title="The Kogogo Farm — Siaya Town"
-            src="https://www.google.com/maps?q=Siaya+Town,+Kenya&output=embed"
-            className="w-full h-[360px] border-0"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+        <div className="h-[500px] rounded-[2rem] overflow-hidden border border-border shadow-[var(--shadow-soft)] bg-muted">
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-muted/50 animate-pulse">
+                <div className="h-12 w-12 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                <p className="text-sm font-medium text-muted-foreground">
+                  Loading interactive map...
+                </p>
+              </div>
+            }
+          >
+            <TripPlanner />
+          </Suspense>
         </div>
       </div>
     </section>

@@ -387,7 +387,7 @@ function GalleryModal({ item, onClose, currentImageIndex, onImageIndexChange }: 
                 setApi={(api) => {
                   if (api) {
                     api.on("select", () => {
-                      onImageIndexChange(api.selectedIndex);
+                      onImageIndexChange(api.selectedScrollSnap());
                     });
                   }
                 }}
