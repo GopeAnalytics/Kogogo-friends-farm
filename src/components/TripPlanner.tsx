@@ -9,7 +9,7 @@ const FARM_LOCATION: google.maps.LatLngLiteral = { lat: -1.2921, lng: 36.8219 };
 
 export default function TripPlannerContainer() {
   return (
-    <APIProvider apiKey={API_KEY} libraries={["places", "routes"]}>
+    <APIProvider apiKey={API_KEY} libraries={["places", "routes", "marker"]}>
       <TripPlanner />
     </APIProvider>
   );
@@ -17,7 +17,10 @@ export default function TripPlannerContainer() {
 
 function TripPlanner() {
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
-  const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
+  const [routeData, setRouteData] = useState<{
+    eta: string;
+    distance: string;
+  } | null>(null);
   const [manualEntry, setManualEntry] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -26,21 +29,16 @@ function TripPlanner() {
   const placesLibrary = useMapsLibrary("places");
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const [directionsRenderer, setDirectionsRenderer] =
-    useState<google.maps.DirectionsRenderer | null>(null);
+  const polylinesRef = useRef<google.maps.Polyline[]>([]);
+  const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
 
-  // Initialize DirectionsRenderer
+  // Cleanup map elements on unmount
   useEffect(() => {
-    if (!routesLibrary || !map) return;
-    const renderer = new routesLibrary.DirectionsRenderer({
-      map,
-      suppressMarkers: false,
-    });
-    setDirectionsRenderer(renderer);
     return () => {
-      renderer.setMap(null);
+      polylinesRef.current.forEach((p) => p.setMap(null));
+      markersRef.current.forEach((m) => (m.map = null));
     };
-  }, [routesLibrary, map]);
+  }, []);
 
   // Handle place selection from autocomplete
   useEffect(() => {
@@ -66,25 +64,57 @@ function TripPlanner() {
 
   // Calculate route when userLocation changes
   useEffect(() => {
-    if (!routesLibrary || !userLocation || !directionsRenderer) return;
+    if (!routesLibrary || !userLocation || !map) return;
 
-    const directionsService = new routesLibrary.DirectionsService();
-    directionsService.route(
-      {
-        origin: userLocation,
-        destination: FARM_LOCATION,
-        travelMode: routesLibrary.TravelMode.DRIVING,
-      },
-      (result, status) => {
-        if (status === routesLibrary.DirectionsStatus.OK && result) {
-          setDirections(result);
-          directionsRenderer.setDirections(result);
-        } else {
-          console.error("Directions request failed due to " + status);
+    const calculateRoute = async () => {
+      try {
+        const request: google.maps.routes.ComputeRoutesRequest = {
+          origin: userLocation,
+          destination: FARM_LOCATION,
+          travelMode: routesLibrary.TravelMode.DRIVING,
+          fields: ["path", "legs.localizedValues"],
+        };
+
+        const { routes } = await routesLibrary.Route.computeRoutes(request);
+
+        if (routes && routes.length > 0) {
+          const route = routes[0];
+
+          // Cleanup previous route elements
+          polylinesRef.current.forEach((p) => p.setMap(null));
+          markersRef.current.forEach((m) => (m.map = null));
+
+          // Draw new polyline
+          const polylines = route.createPolylines();
+          polylines.forEach((p) => p.setMap(map));
+          polylinesRef.current = polylines;
+
+          // Add markers
+          const markers = await route.createWaypointAdvancedMarkers();
+          markers.forEach((m) => (m.map = map));
+          markersRef.current = markers;
+
+          // Set route details
+          const leg = route.legs?.[0];
+          if (leg) {
+            setRouteData({
+              eta: leg.localizedValues?.duration || "N/A",
+              distance: leg.localizedValues?.distance || "N/A",
+            });
+          }
+
+          // Fit map to route
+          const bounds = new google.maps.LatLngBounds();
+          route.path?.forEach((point) => bounds.extend(point));
+          map.fitBounds(bounds, 50);
         }
-      },
-    );
-  }, [routesLibrary, userLocation, directionsRenderer]);
+      } catch (error) {
+        console.error("Error computing routes:", error);
+      }
+    };
+
+    calculateRoute();
+  }, [routesLibrary, userLocation, map]);
 
   const handlePlanVisit = () => {
     setLoading(true);
@@ -108,10 +138,6 @@ function TripPlanner() {
       setLoading(false);
     }
   };
-
-  const route = directions?.routes[0]?.legs[0];
-  const eta = route?.duration?.text;
-  const distance = route?.distance?.text;
 
   return (
     <div className="flex flex-col h-full bg-card rounded-[2rem] overflow-hidden border border-border shadow-[var(--shadow-soft)]">
@@ -152,7 +178,7 @@ function TripPlanner() {
       </div>
 
       <div className="p-6 bg-background border-t border-border">
-        {directions ? (
+        {routeData ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-secondary/50 border border-border">
@@ -161,7 +187,7 @@ function TripPlanner() {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                     ETA
                   </p>
-                  <p className="font-bold text-foreground">{eta}</p>
+                  <p className="font-bold text-foreground">{routeData.eta}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-2xl bg-secondary/50 border border-border">
@@ -170,7 +196,7 @@ function TripPlanner() {
                   <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                     Distance
                   </p>
-                  <p className="font-bold text-foreground">{distance}</p>
+                  <p className="font-bold text-foreground">{routeData.distance}</p>
                 </div>
               </div>
             </div>
