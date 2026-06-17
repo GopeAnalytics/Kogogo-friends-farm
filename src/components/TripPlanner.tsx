@@ -1,21 +1,41 @@
-import React, { useState, useEffect, useRef, lazy, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { APIProvider, Map, useMapsLibrary, useMap } from "@vis.gl/react-google-maps";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { MapPin, Navigation, Car, Clock } from "lucide-react";
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string;
-const FARM_LOCATION: google.maps.LatLngLiteral = { lat: -1.2921, lng: 36.8219 };
+const FARM_LOCATION: google.maps.LatLngLiteral = { lat: 0.0607, lng: 34.2882 };
 
 export default function TripPlannerContainer() {
   return (
-    <APIProvider apiKey={API_KEY} libraries={["places", "routes", "marker"]}>
+    <APIProvider apiKey={API_KEY} libraries={["places", "routes", "marker", "geometry"]}>
       <TripPlanner />
     </APIProvider>
   );
 }
 
 function TripPlanner() {
+  return (
+    <div className="flex flex-col h-full bg-card rounded-[2rem] overflow-hidden border border-border shadow-[var(--shadow-soft)]">
+      <div className="relative flex-1 min-h-[400px]">
+        <Map
+          defaultCenter={FARM_LOCATION}
+          defaultZoom={13}
+          mapId="bf51a9102b3482bc"
+          className="w-full h-full"
+          fullscreenControl={false}
+          streetViewControl={false}
+          mapTypeControl={false}
+        >
+          <TripPlannerContent />
+        </Map>
+      </div>
+    </div>
+  );
+}
+
+function TripPlannerContent() {
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [routeData, setRouteData] = useState<{
     eta: string;
@@ -32,7 +52,6 @@ function TripPlanner() {
   const polylinesRef = useRef<google.maps.Polyline[]>([]);
   const markersRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
 
-  // Cleanup map elements on unmount
   useEffect(() => {
     return () => {
       polylinesRef.current.forEach((p) => p.setMap(null));
@@ -40,7 +59,6 @@ function TripPlanner() {
     };
   }, []);
 
-  // Handle place selection from autocomplete
   useEffect(() => {
     if (!placesLibrary || !inputRef.current) return;
 
@@ -60,9 +78,8 @@ function TripPlanner() {
         setManualEntry(false);
       }
     });
-  }, [placesLibrary]);
+  }, [placesLibrary, manualEntry]);
 
-  // Calculate route when userLocation changes
   useEffect(() => {
     if (!routesLibrary || !userLocation || !map) return;
 
@@ -72,7 +89,13 @@ function TripPlanner() {
           origin: userLocation,
           destination: FARM_LOCATION,
           travelMode: routesLibrary.TravelMode.DRIVING,
-          fields: ["path", "legs.localizedValues"],
+          routingPreference: routesLibrary.RoutingPreference.TRAFFIC_AWARE,
+          fields: [
+            "routes.duration",
+            "routes.distanceMeters",
+            "routes.polyline",
+            "routes.legs.localizedValues",
+          ],
         };
 
         const { routes } = await routesLibrary.Route.computeRoutes(request);
@@ -80,21 +103,41 @@ function TripPlanner() {
         if (routes && routes.length > 0) {
           const route = routes[0];
 
-          // Cleanup previous route elements
           polylinesRef.current.forEach((p) => p.setMap(null));
+          polylinesRef.current = [];
           markersRef.current.forEach((m) => (m.map = null));
+          markersRef.current = [];
 
-          // Draw new polyline
-          const polylines = route.createPolylines();
-          polylines.forEach((p) => p.setMap(map));
-          polylinesRef.current = polylines;
+          if (route.path) {
+            const polyline = new google.maps.Polyline({
+              path: route.path,
+              geodesic: true,
+              strokeColor: "#10b981",
+              strokeOpacity: 0.8,
+              strokeWeight: 6,
+              map: map,
+            });
+            polylinesRef.current = [polyline];
+          }
 
-          // Add markers
-          const markers = await route.createWaypointAdvancedMarkers();
-          markers.forEach((m) => (m.map = map));
-          markersRef.current = markers;
+          const { AdvancedMarkerElement } = (await google.maps.importLibrary(
+            "marker",
+          )) as google.maps.MarkerLibrary;
 
-          // Set route details
+          const startMarker = new AdvancedMarkerElement({
+            map,
+            position: userLocation,
+            title: "Your Location",
+          });
+
+          const endMarker = new AdvancedMarkerElement({
+            map,
+            position: FARM_LOCATION,
+            title: "The Kogogo Farm",
+          });
+
+          markersRef.current = [startMarker, endMarker];
+
           const leg = route.legs?.[0];
           if (leg) {
             setRouteData({
@@ -103,10 +146,11 @@ function TripPlanner() {
             });
           }
 
-          // Fit map to route
-          const bounds = new google.maps.LatLngBounds();
-          route.path?.forEach((point) => bounds.extend(point));
-          map.fitBounds(bounds, 50);
+          if (route.path && route.path.length > 0) {
+            const bounds = new google.maps.LatLngBounds();
+            route.path.forEach((point) => bounds.extend(point));
+            map.fitBounds(bounds, 50);
+          }
         }
       } catch (error) {
         console.error("Error computing routes:", error);
@@ -140,44 +184,32 @@ function TripPlanner() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-card rounded-[2rem] overflow-hidden border border-border shadow-[var(--shadow-soft)]">
-      <div className="relative flex-1 min-h-[400px]">
-        <Map
-          defaultCenter={FARM_LOCATION}
-          defaultZoom={13}
-          mapId="bf51a9102b3482bc" // Optional: add your Map ID for advanced styling
-          className="w-full h-full"
-          fullscreenControl={false}
-          streetViewControl={false}
-          mapTypeControl={false}
-        />
+    <>
+      <div className="absolute top-4 left-4 right-4 z-10 flex flex-col gap-2">
+        {!userLocation && !manualEntry && (
+          <Button
+            onClick={handlePlanVisit}
+            disabled={loading}
+            className="w-full shadow-lg bg-primary hover:bg-primary/90 text-white py-6 rounded-2xl"
+          >
+            <Navigation className="mr-2 h-5 w-5" />
+            {loading ? "Locating..." : "Plan My Visit"}
+          </Button>
+        )}
 
-        <div className="absolute top-4 left-4 right-4 z-10 flex flex-col gap-2">
-          {!userLocation && !manualEntry && (
-            <Button
-              onClick={handlePlanVisit}
-              disabled={loading}
-              className="w-full shadow-lg bg-primary hover:bg-primary/90 text-white py-6 rounded-2xl"
-            >
-              <Navigation className="mr-2 h-5 w-5" />
-              {loading ? "Locating..." : "Plan My Visit"}
-            </Button>
-          )}
-
-          {manualEntry && (
-            <div className="relative">
-              <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                ref={inputRef}
-                placeholder="Enter your starting location in Kenya..."
-                className="pl-12 py-6 shadow-lg bg-background border-2 border-primary/20 focus:border-primary rounded-2xl"
-              />
-            </div>
-          )}
-        </div>
+        {manualEntry && (
+          <div className="relative">
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+            <Input
+              ref={inputRef}
+              placeholder="Enter your starting location in Kenya..."
+              className="pl-12 py-6 shadow-lg bg-background border-2 border-primary/20 focus:border-primary rounded-2xl"
+            />
+          </div>
+        )}
       </div>
 
-      <div className="p-6 bg-background border-t border-border">
+      <div className="absolute bottom-0 left-0 right-0 p-6 bg-background border-t border-border z-10">
         {routeData ? (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -223,6 +255,6 @@ function TripPlanner() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
